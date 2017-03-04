@@ -168,9 +168,9 @@ class Cell():
 
     def draw(self):
         COST_TO_DRAW = ''
-        # COST_TO_DRAW = self.g_cost
-        # COST_TO_DRAW = self.h_cost
-        # COST_TO_DRAW = self.f_cost
+        COST_TO_DRAW = self.g_cost
+        COST_TO_DRAW = self.h_cost
+        COST_TO_DRAW = self.f_cost
         line_width = 2
         rect = pygame.Rect(self.coordinates, self.dimensions)
         pygame.draw.rect(self.draw_screen, self.color, rect, line_width)
@@ -282,3 +282,4 @@ class Paul(Actor):
 if __name__ == "__main__":
     g = GridWorld()
     g.main_loop()
+    pygame.quit()

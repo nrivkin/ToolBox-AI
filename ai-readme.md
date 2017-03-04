@@ -2,7 +2,24 @@ To use this astar GUI/toy, hit the 'l' key to switch to the 'add lava tiles' mod
 
 0. Read up on astar [here](http://web.mit.edu/eranki/www/tutorials/search/) and [here](http://www.raywenderlich.com/4946/introduction-to-a-pathfinding). Do your best to understand what the pseudocode in the links mean. What are the advantages that A star has over breadth-first search? What advantages does A star have over depth-first search? 
 
+
+depth-first searches do not always find the shortest path (they usually don't), and they are computationally intensive, potentially requiring iterating over all nodes.
+
+
+
+
+
 1. Take a look at lines 124-127 of the code. Try commenting and uncommenting lines and running python astar.py to see what values are printed in each cell. Take a screenshot of each example with some lava tiles placed down, and in your own words, explain what f_score, g_score, and h_score are, and why you see those specific values in the screenshot. 
+
+f_score is the total predicted cost to reach th objective. It is the sum of g_score and h_score.
+
+g_score is the distance traveled to reach the square in question. it is calculated by adding one to the parent square with the lowest g_score.
+
+h_score is the distance from a square to the goal, ignoring obstacles. It is the predicted cost of reaching the goal from the location where it appears. It is not the actual number of steps it will takes, but a hueristic estimate.
+
+
+
+
 
 For questions 2, 3, and 4, you should implement the code to get the specified behavior, but also place tiles and set up a scenario/path where that newly implemented behavior is demonstrated (ex. Paul moving diagonally or moving through a swamp.) Then include a screenshot and explanation. Quoting Paul, "Once you make a change, you should include a screenshot of the pygame window that shows the generated path for a given set of obstacles. You should be ready to explain why the shown path is actually the shortest (for instance… “the diagonal move while costly, is necessary in order to reach the goal, paths consisting of just up, down, left, or right would not be able to reach the goal”)."
 
