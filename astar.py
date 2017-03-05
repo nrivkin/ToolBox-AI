@@ -71,10 +71,23 @@ class GridWorld():
         except:
             return False
 
+    def _is_impassible(self, cell_coord): # to allow jumping into swamps
+        try:
+            actor = self.actors[cell_coord]
+            return actor.is_impassible
+        except:
+            return False
+
     def _add_swamp(self, mouse_pos):
         """ Adds a swamp tile in the cell that mouse_pos indicates """
-        # insert swamp code here.
-        pass
+        swamp_coord = (mouse_pos[0]//50, mouse_pos[1]//50)
+        if self._is_occupied(swamp_coord):
+            if self.actors[swamp_coord].removable:
+                self.actors.pop(swamp_coord, None)
+        elif swamp_coord != self.cake.cell_coordinates:
+            swamp = ObstacleTile(swamp_coord, self, './images/swamp.jpg',
+                                is_unpassable=False, terrain_cost=3)
+            self.actors[swamp_coord] = swamp
 
     def _add_lava(self, mouse_pos):
         """ Adds a lava tile in the cell that mouse_pos indicates """
@@ -108,14 +121,16 @@ class GridWorld():
                 elif event.type is pygame.MOUSEBUTTONDOWN:
                     if self.add_tile_type == 'lava':
                         self._add_lava(event.pos)
-                    # insert swamp code here
+                    elif self.add_tile_type == 'swamp':
+                        self._add_swamp(event.pos)
                 elif event.type is pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         self.paul.run_astar(self.cake.cell_coordinates, self)
                         self.paul.get_path()
                     elif event.key == pygame.K_l:
                         self.add_tile_type = 'lava'
-                    # insert swamp code here
+                    elif event.key == pygame.K_s:
+                        self.add_tile_type = 'swamp'
 
 
 class Actor(object):
@@ -147,7 +162,7 @@ class ObstacleTile(Actor):
                  terrain_cost=0, is_unpassable=True):
         super(ObstacleTile, self) \
             .__init__(cell_coordinates, world, image_loc, removable=True,
-                      is_obstacle=is_unpassable)
+                      is_obstacle=True) # needs to be true in order to remove swamp tiles
         self.terrain_cost = terrain_cost
 
 
@@ -169,8 +184,8 @@ class Cell():
     def draw(self):
         COST_TO_DRAW = ''
         COST_TO_DRAW = self.g_cost
-        COST_TO_DRAW = self.h_cost
-        COST_TO_DRAW = self.f_cost
+        # COST_TO_DRAW = self.h_cost
+        # COST_TO_DRAW = self.f_cost
         line_width = 2
         rect = pygame.Rect(self.coordinates, self.dimensions)
         pygame.draw.rect(self.draw_screen, self.color, rect, line_width)
@@ -197,13 +212,28 @@ class Paul(Actor):
             open, and not in the closed list. """
         # modify directions and costs as needed
         directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-        all_adj = [self.world._add_coords(coords, d) for d in directions]
+        diagonal = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
+        jump = [(2, 0), (0, 2), (-2, 0), (0, -2)]
+        # jumping diagonals is not allowed
+        all_adj = [self.world._add_coords(coords, ds) for ds in directions]
+        all_diag = [self.world._add_coords(coords, dl) for dl in diagonal]
+        all_jump = [self.world._add_coords(coords, j) for j in jump]
         in_bounds = [self.is_valid(c) for c in all_adj]
+        on_diag = [self.is_valid(c) for c in all_diag]
+        can_jump = [self.is_jumpable(c) for c in all_jump] # In order to allow jumping into swamps I created is_jumpable
         costs = []
         open_adj = []
         for i, coord in enumerate(all_adj):
             if(in_bounds[i]):
                 costs.append(1 + self.world.get_terrain_cost(coord))
+                open_adj.append(coord)
+        for i, coord in enumerate(all_diag):
+            if(on_diag[i]):
+                costs.append(3 + self.world.get_terrain_cost(coord))
+                open_adj.append(coord)
+        for i, coord in enumerate(all_jump):
+            if(can_jump[i]):
+                costs.append(8 + self.world.get_terrain_cost(coord))
                 open_adj.append(coord)
         return open_adj, costs
 
@@ -211,6 +241,11 @@ class Paul(Actor):
         return self.world._is_in_grid(coord) \
             and not self.world._is_occupied(coord) \
             and coord not in self.closed_list
+
+    def is_jumpable(self, coord):
+        return self.world._is_in_grid(coord) \
+            and not self.world._is_impassible(coord) \
+            and coord not in self.closed_list # allows jumping into swamps
 
     def get_lowest_cost_open_coord(self):
         open_cells = self.open_list

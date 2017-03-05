@@ -9,7 +9,7 @@ depth-first searches do not always find the shortest path (they usually don't), 
 
 
 
-1. Take a look at lines 124-127 of the code. Try commenting and uncommenting lines and running python astar.py to see what values are printed in each cell. Take a screenshot of each example with some lava tiles placed down, and in your own words, explain what f_score, g_score, and h_score are, and why you see those specific values in the screenshot. 
+1. Take a look at lines 124-127 of the code. Try commenting and uncommenting lines and running python astar.py to see what values are printed in each cell. Take a screenshot of each example with some lava tiles placed down, and in your own words, explain what f_score, g_score, and h_score are, and why you see those specific values in the screenshot.
 
 f_score is the total predicted cost to reach th objective. It is the sum of g_score and h_score.
 
@@ -17,7 +17,7 @@ g_score is the distance traveled to reach the square in question. it is calculat
 
 h_score is the distance from a square to the goal, ignoring obstacles. It is the predicted cost of reaching the goal from the location where it appears. It is not the actual number of steps it will takes, but a hueristic estimate.
 
-
+The screenshots are in the image folder, and are named \*\_score_example.png. h_score shows the distance between the tile and the goal, regardless of obstacles. a specific example would be the green sqaure adjacent to paul. If you count the x distance that would need to be traversed to reacj the cake (ignoring obstacles), you will find it to be eqaul to 17 .g_score shows the distance that would have to be traveled to reach a square. Each square has a numder one greater than the lowest adjacent square. In the example, you can see this by examining any sqare and seeing that it is one greater than its lowest parent. f_score is the sum of g_score and h_score, which can be observed in the example by calculating the scores.
 
 
 
